@@ -1,0 +1,20 @@
+{
+  "posts/create-date-dimension/create-date-dimension.qmd": {
+    "create-date-dimension.html": "8904a47f"
+  },
+  "about.qmd": {
+    "about.html": "c684126b"
+  },
+  "posts/post-with-code/index.qmd": {
+    "index.html": "524c75d1"
+  },
+  "posts/use-date-dimension/use-date-dimension.qmd": {
+    "use-date-dimension.html": "2214621c"
+  },
+  "posts/welcome/index.qmd": {
+    "index.html": "2ec625aa"
+  },
+  "index.qmd": {
+    "index.html": "317c2990"
+  }
+}
