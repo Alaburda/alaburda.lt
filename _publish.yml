@@ -1,0 +1,4 @@
+- source: project
+  netlify:
+    - id: "bab25419-cb6b-4df2-8889-801ef088e46f"
+      url: "https://cocky-neumann-5e5ae0.netlify.app"
