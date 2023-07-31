@@ -1,0 +1,55 @@
+When preparing fact tables, there's a tension between choosing a wide or a long format. When data is in the long format, it's more flexible: you can have a column "attribute" that contains any possible attribute and (mostly) never worry about new attributes. In the wide format, however, you have less rows to deal with overall and some operations are easier to express using wide data. This blog post will explain how to go from long to wide in SQL and when to choose which format.
+
+# The scenario
+
+Let's say we run an e-commerce site that sells toys on Shopify. If we look at [Shopify's API](https://shopify.dev/docs/api/admin-rest/2023-07/resources/order), we see that there is the order and then there are the line items under the order. A line item has a price, a discount, a tax line and a discount allocation. Let's focus on the line items here. Shopify's API starts us off on the right foot by presenting the data in a nested long format. What we're going to do is get that the data unnested all the way to awide format and then see how it would behave in a long format.
+
+# What's long data anyway?
+
+If taken to the extreme, long data is composed of at least two columns: an attribute column and a value column. The attribute tells us what we're describing and the value column tells us the description of the attribute. In the Shopify example, a long data format could look something like this:
+
+price line | amount
+price
+total_discount
+tax_lines_price
+discount_allocations
+
+Presenting data in a long format has a few inherent advantages:
+
+* You can just SUM() the amount columns - as long as the total_discount and discount_allocations have negative signs so that we deduce the discount rather than add it, the sum will be correct. In cases where you need to check the total amount frequently, this is incredibly powerful and very simple to use.
+* Selecting a subset is also relatively simple as all you have to do is filter on it - using filters, you get the total discount amount, discount allocations, the works.
+
+# What's wide data anyway?
+
+On the other hand, you probably are going to have just a single price and a single total discount at time of purchase - why not give them their own dedicated column like in the Shopify example?
+
+
+# Pivoting with PIVOT()
+
+SELECT identifier,
+       [Attribute1] AS Attribute1,
+       [Attribute2] AS Attribute2,
+       ...
+FROM (
+    SELECT identifier, attribute, value
+    FROM long_data_table
+) AS PivotData
+PIVOT (
+    SUM(value)
+    FOR attribute IN ([Attribute1], [Attribute2], ...)
+) AS PivotResult;
+
+# Pivoting with group by and sum
+
+select
+  sum(iif(price_line,'price',1,0)*amount)
+
+https://dba.stackexchange.com/questions/164835/which-is-faster-sumcase-or-cte-pivot
+
+https://www.sqlservercentral.com/articles/an-alternative-better-method-to-unpivot-sql-spackle
+
+
+
+
+
+
