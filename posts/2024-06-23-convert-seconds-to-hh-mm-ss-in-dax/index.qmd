@@ -10,7 +10,7 @@ Solutions to convert an integer into a time format in DAX are not great. The def
 
 https://stackoverflow.com/questions/45584262/how-to-convert-seconds-into-hhmm-format-in-power-bi
 
-```{dax}
+```
 
 Measure = 
   VAR _hours_fraction = seconds/3600
