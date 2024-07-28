@@ -1,0 +1,44 @@
+---
+Title: "Generate Series in SQL"
+
+---
+
+Generating series is something I run sometimes but not frequently enough to warrant memorising it.
+
+# T-SQL
+
+Generating a series can be done using a Tally Table (a brief intro on it can be found [here](https://www.sqlservercentral.com/articles/the-numbers-or-tally-table-what-it-is-and-how-it-replaces-a-loop-1)):
+
+```{sql}
+#| eval: false
+
+SELECT TOP 11000 --equates to more than 30 years of dates
+        IDENTITY(INT,1,1) AS N
+   INTO dbo.Tally
+   FROM Master.dbo.SysColumns sc1,
+        Master.dbo.SysColumns sc2
+
+```
+
+
+# DuckDB
+
+```{r}
+
+library(duckdb)
+
+con <- dbConnect(duckdb::duckdb())
+
+```
+
+
+```{sql, connection = con}
+
+SELECT *
+FROM generate_series(DATE '1992-01-01', DATE '1992-03-01', INTERVAL '1' MONTH);
+
+```
+
+
+
+

@@ -1,0 +1,14 @@
+{
+  "hash": "ee7e545067cf15a04715af24bcc3fae3",
+  "result": {
+    "markdown": "---\nTitle: \"Generate Series in SQL\"\n\n---\n\n\nGenerating series is something I run sometimes but not frequently enough to warrant memorising it.\n\n# T-SQL\n\nGenerating a series can be done using a Tally Table (a brief intro on it can be found [here](https://www.sqlservercentral.com/articles/the-numbers-or-tally-table-what-it-is-and-how-it-replaces-a-loop-1)):\n\n\n::: {.cell}\n\n```{.sql .cell-code}\nSELECT TOP 11000 --equates to more than 30 years of dates\n        IDENTITY(INT,1,1) AS N\n   INTO dbo.Tally\n   FROM Master.dbo.SysColumns sc1,\n        Master.dbo.SysColumns sc2\n\n```\n:::\n\n\n\n# DuckDB\n\n\n::: {.cell}\n\n```{.r .cell-code}\nlibrary(duckdb)\n```\n\n::: {.cell-output .cell-output-stderr}\n```\nWarning: paketas 'duckdb' buvo sukurtas pagal R versiją 4.3.3\n```\n:::\n\n::: {.cell-output .cell-output-stderr}\n```\nĮkeliamas reikalingas paketas: DBI\n```\n:::\n\n```{.r .cell-code}\ncon <- dbConnect(duckdb::duckdb())\n```\n:::\n\n::: {.cell}\n\n```{.sql .cell-code}\n\nSELECT *\nFROM generate_series(DATE '1992-01-01', DATE '1992-03-01', INTERVAL '1' MONTH);\n\n```\n\n\n<div class=\"knitsql-table\">\n\n\nTable: 3 records\n\n|generate_series |\n|:---------------|\n|1992-01-01      |\n|1992-02-01      |\n|1992-03-01      |\n\n</div>\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

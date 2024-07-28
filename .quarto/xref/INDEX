@@ -16,5 +16,14 @@
   },
   "index.qmd": {
     "index.html": "317c2990"
+  },
+  "posts/2024-07-28-generate-series-in-sql/generate-series-in-sql.qmd": {
+    "generate-series-in-sql.html": "05c09a6c"
+  },
+  "posts/2024-06-23-connect-to-fabric-lakehouse-using-r/index.qmd": {
+    "index.html": "737db70a"
+  },
+  "posts/2024-06-23-convert-seconds-to-hh-mm-ss-in-dax/index.qmd": {
+    "index.html": "7be34fc3"
   }
 }

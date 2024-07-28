@@ -9,7 +9,7 @@
   {
     "objectID": "about.html",
     "href": "about.html",
-    "title": "About",
+    "title": "Apie",
     "section": "",
     "text": "About this blog"
   },
@@ -32,6 +32,27 @@
     "href": "index.html",
     "title": "alaburda.lt",
     "section": "",
-    "text": "Create a Date Dimension\n\n\n\n\n\n\n\ndata warehouse\n\n\n\n\n\n\n\n\n\n\n\nJun 29, 2023\n\n\nPaulius Alaburda\n\n\n\n\n\n\nNo matching items"
+    "text": "T-SQL\n\n\n\n\n\n\n\n\n\n\n \n\n\n\n\n  \n\n\n\n\nConnect to Fabric Lakehouse using R and Python\n\n\n\n\n\n\n\nR\n\n\n\n\n\n\n\n\n\n\n\nJun 23, 2024\n\n\n\n\n\n\n  \n\n\n\n\nConvert seconds to hh:mm:ss in DAX\n\n\n\n\n\n\n\npbi\n\n\n\n\n\n\n\n\n\n\n\nJun 23, 2024\n\n\nPaulius Alaburda\n\n\n\n\n\n\n  \n\n\n\n\nCreate a Date Dimension\n\n\n\n\n\n\n\ndata warehouse\n\n\n\n\n\n\n\n\n\n\n\nJun 29, 2023\n\n\nPaulius Alaburda\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/2024-07-28-generate-series-in-sql/generate-series-in-sql.html",
+    "href": "posts/2024-07-28-generate-series-in-sql/generate-series-in-sql.html",
+    "title": "T-SQL",
+    "section": "",
+    "text": "Generating series is something I run sometimes but not frequently enough to warrant memorising it.\n\nT-SQL\nGenerating a series can be done using a Tally Table (a brief intro on it can be found here):\n\nSELECT TOP 11000 --equates to more than 30 years of dates\n        IDENTITY(INT,1,1) AS N\n   INTO dbo.Tally\n   FROM Master.dbo.SysColumns sc1,\n        Master.dbo.SysColumns sc2\n\n\n\nDuckDB\n\nlibrary(duckdb)\n\nWarning: paketas 'duckdb' buvo sukurtas pagal R versiją 4.3.3\n\n\nĮkeliamas reikalingas paketas: DBI\n\ncon &lt;- dbConnect(duckdb::duckdb())\n\n\n\nSELECT *\nFROM generate_series(DATE '1992-01-01', DATE '1992-03-01', INTERVAL '1' MONTH);\n\n\n3 records\n\n\ngenerate_series\n\n\n\n\n1992-01-01\n\n\n1992-02-01\n\n\n1992-03-01"
+  },
+  {
+    "objectID": "posts/2024-06-23-connect-to-fabric-lakehouse-using-r/index.html",
+    "href": "posts/2024-06-23-connect-to-fabric-lakehouse-using-r/index.html",
+    "title": "Connect to Fabric Lakehouse using R and Python",
+    "section": "",
+    "text": "Using a custom DSN\n\n\nUsing a Service Principal\nodbc::dbConnect(odbc::odbc(), driver = “SQL Server 17”, Authentication = “ActiveDirectoryServicePrincipal”)\n\n\nUsing Azureclicredential"
+  },
+  {
+    "objectID": "posts/2024-06-23-convert-seconds-to-hh-mm-ss-in-dax/index.html",
+    "href": "posts/2024-06-23-convert-seconds-to-hh-mm-ss-in-dax/index.html",
+    "title": "Convert seconds to hh:mm:ss in DAX",
+    "section": "",
+    "text": "Solutions to convert an integer into a time format in DAX are not great. The default should be FORMAT([seconds], \"hh:mm:ss\") but it doesn’t work on a hierachical two-way matrix. Here’s my preffered way:\nhttps://stackoverflow.com/questions/45584262/how-to-convert-seconds-into-hhmm-format-in-power-bi\n\nMeasure = \n  VAR _hours_fraction = seconds/3600\n  VAR _hours = TRUNC(_hours_fraction)\n  VAR _minutes_fraction = (_hours_fraction - _hours)*60\n  VAR _minutes = TRUNC(_minutes_fraction)\n  VAR _seconds = ROUND((_minutes_fraction - _minutes)*60, 0)\n\n  RETURN(TIME(_hours, _minutes, _seconds))"
   }
 ]

@@ -2,6 +2,9 @@
   {
     "listing": "/index.html",
     "items": [
+      "/posts/2024-07-28-generate-series-in-sql/generate-series-in-sql.html",
+      "/posts/2024-06-23-connect-to-fabric-lakehouse-using-r/index.html",
+      "/posts/2024-06-23-convert-seconds-to-hh-mm-ss-in-dax/index.html",
       "/posts/create-date-dimension/create-date-dimension.html"
     ]
   }

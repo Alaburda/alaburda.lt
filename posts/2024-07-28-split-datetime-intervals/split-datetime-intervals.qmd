@@ -1,0 +1,133 @@
+---
+
+Title: "Split datetime intervals"
+
+---
+
+If you're working with session date that has a start and an end datetime and if the sessions happen when interacting with finite items (chat agents, customer service providers, charging stations), a business manager could ask the question: "Hey, how was our fueling station for the 1st of August?" Let's say our data looks like this:
+
+```{r}
+
+library(duckdb)
+library(lubridate)
+
+con <- dbConnect(duckdb::duckdb())
+
+session_durations <- sample.int(240, 100, replace = TRUE)
+session_gaps <- sample.int(20, 100, replace = TRUE)
+
+session_offsets <- cumsum(c(rbind(session_gaps,session_durations)))
+session_times <- as.Date("2024-07-30") %m+% minutes(session_offsets)
+session_matrix <- matrix(session_times, ncol = 2, byrow = TRUE)
+colnames(session_matrix) <- c("session_start","session_end")
+
+sessions <- tibble::as_tibble(session_matrix) %>% 
+  mutate_all(as.POSIXct) %>% 
+  mutate(duration_min = session_durations)
+
+dbWriteTable(con, "sessions", sessions, overwrite = TRUE)
+
+```
+
+If you're filtering or aggregating on the session start, you'll eliminate all sessions that started before 2024-08-01:
+
+```{sql connection = con}
+
+select 
+  sum(datediff('minute',session_start,session_end))
+from sessions
+where cast(session_start as date) = '2024-08-01'
+
+```
+
+This also includes rows that had their session end after 2024-08-01:
+
+```{sql connection = con}
+
+select 
+  *
+from sessions
+where cast(session_start as date) = '2024-08-01'
+and cast(session_end as date) = '2024-08-02'
+
+```
+So do we do a between clause? Noooo, that could lead to session times that are more than there are hours in the day!
+
+```{sql connection = con}
+
+select 
+  sum(datediff('minute',session_start,session_end))
+from sessions
+where '2024-08-02' between cast(session_start as date) and cast(session_end as date)
+
+```
+## The correct approach
+
+The correct approach is to use a tally table or a reference table with specified hours. Like this:
+
+```{sql connection = con}
+
+CREATE TABLE calendar_hours as 
+with start_times as (
+  SELECT *
+  FROM generate_series(DATE '2024-07-30', DATE '2024-08-10', INTERVAL '1' HOUR)
+)
+select 
+  generate_series as start_time,
+  lead(generate_series,1) over (order by generate_series) - interval '1' MINUTE as end_time
+from start_times
+
+```
+
+```{sql connection = con}
+
+select *
+from calendar_hours
+limit 10
+
+```
+
+```{sql connection = con}
+
+CREATE TABLE session_intervals as 
+select 
+  case when session_start > start_time then session_start else start_time end as session_start,
+  case when session_end < end_time then session_end else end_time end as session_end
+from calendar_hours
+inner join sessions
+  on start_time <= session_end 
+  and end_time >= session_start
+
+
+```
+
+The query above uses date intersection, wherein we join the calendar table to our session table using a range join. Without the range join, we would end up with a cross join, combining all rows from both tables together. The range join filters down our output to only rows where the "ends" from each interval overlaps. For example:
+
+```
+                        |---- session ------|
+|---calendar hour --------|                          
+
+        |---- session ------|
+                          |---calendar hour --------|                          
+
+
+```
+
+The end of the calendar hour overlaps with the start of the session in the first example. In the second one, the end of the session overlaps with the start of the calendar hour.
+
+Having built this, we can actually calculate things!
+
+## The final output
+
+```{sql connection = con}
+
+select 
+  cast(session_start as date) as session_day,
+  sum(datediff('minute',session_start,session_end)) as session_duration
+from session_intervals
+group by cast(session_start as date)
+
+```
+
+
+
